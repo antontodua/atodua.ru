@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#050506">
+  <title>atodua.ru</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400&display=swap" rel="stylesheet">
+  <style>
+    /*
+      Smart TV notes: no JS, no filters or blend modes, and a fallback for every
+      property that older Chromium-based TV browsers lack. Only the two light
+      overlays repaint; the haze moves by transform on its own layer.
+    */
+    *, *:before, *:after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #050506;
+    }
+
+    body {
+      display: -webkit-box;
+      display: flex;
+      -webkit-box-align: center;
+      align-items: center;
+      -webkit-box-pack: center;
+      justify-content: center;
+      background: radial-gradient(ellipse 60% 45% at 50% 50%, #17171b 0%, #0b0b0d 45%, #050506 100%);
+    }
+
+    .haze, .grain, .vignette {
+      position: fixed;
+      top: 0; right: 0; bottom: 0; left: 0;
+      pointer-events: none;
+    }
+
+    /* Soft gradients need no blur filter; only transform is animated */
+    .haze {
+      top: -20%; right: -20%; bottom: -20%; left: -20%;
+      background:
+        radial-gradient(closest-side at 35% 45%, rgba(190, 195, 210, .06), transparent),
+        radial-gradient(closest-side at 65% 55%, rgba(150, 155, 170, .045), transparent);
+      will-change: transform;
+      animation: drift 28s ease-in-out infinite alternate;
+    }
+
+    .grain {
+      opacity: .045;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    .vignette {
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, .75) 100%);
+    }
+
+    .mark {
+      position: relative;
+      text-align: center;
+    }
+
+    h1, .line {
+      font-size: 12vw;
+      font-size: clamp(2.5rem, 12vw, 14rem);
+    }
+
+    h1 {
+      position: relative;
+      margin: 0;
+      font-family: "Bodoni Moda", Didot, "Bodoni 72", "Times New Roman", serif;
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: .04em;
+      white-space: nowrap;
+    }
+
+    /* Three stacked copies of the caption: silver base + two light layers */
+    .base, .glint, .glow {
+      display: block;
+      color: transparent;
+      background-repeat: no-repeat;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .glint, .glow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
+
+    .base {
+      background-image: linear-gradient(180deg,
+        #f4f4f6 0%,
+        #b9bac0 22%,
+        #fdfdff 38%,
+        #7d7e85 52%,
+        #a9aab0 64%,
+        #e9e9ee 80%,
+        #6b6c72 100%);
+    }
+
+    /* Sharp streak; irregular stops and two unrelated periods read as random */
+    .glint {
+      background-image: linear-gradient(112deg,
+        transparent 45%,
+        rgba(255, 255, 255, .95) 49.5%,
+        rgba(255, 255, 255, .95) 50.5%,
+        transparent 55%);
+      background-size: 300% 100%;
+      background-position: -20% 0;
+      animation:
+        glint 11.3s ease-in-out infinite,
+        flicker 4.7s ease-in-out infinite alternate;
+    }
+
+    /* Wide soft band plus a wandering hotspot */
+    .glow {
+      background-image:
+        linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, .28) 50%, transparent 70%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, .5) 0, transparent 14%);
+      background-size: 250% 100%, 200% 300%;
+      background-position: 50% 0, 50% 50%;
+      animation: glow 17.9s ease-in-out infinite;
+    }
+
+    .line {
+      display: block;
+      width: 38%;
+      height: 1px;
+      margin: .25em auto 0;
+      background: linear-gradient(90deg, transparent, rgba(220, 222, 230, .45), transparent);
+    }
+
+    @keyframes glint {
+      0%   { background-position: -20% 0; }
+      17%  { background-position: 62% 0; }
+      29%  { background-position: 41% 0; }
+      46%  { background-position: 118% 0; }
+      58%  { background-position: 74% 0; }
+      71%  { background-position: 28% 0; }
+      84%  { background-position: 55% 0; }
+      100% { background-position: -20% 0; }
+    }
+
+    @keyframes flicker {
+      0%   { opacity: .45; }
+      30%  { opacity: 1; }
+      55%  { opacity: .35; }
+      80%  { opacity: .9; }
+      100% { opacity: .6; }
+    }
+
+    @keyframes glow {
+      0%   { background-position: 20% 0, 15% 30%; }
+      19%  { background-position: 70% 0, 70% 65%; }
+      37%  { background-position: 45% 0, 40% 20%; }
+      58%  { background-position: 85% 0, 90% 55%; }
+      76%  { background-position: 30% 0, 25% 75%; }
+      100% { background-position: 20% 0, 15% 30%; }
+    }
+
+    @keyframes drift {
+      from { transform: translate3d(-4%, -2%, 0) scale(1); }
+      to   { transform: translate3d(4%, 3%, 0) scale(1.1); }
+    }
+
+    @media (max-width: 600px) {
+      h1, .line { font-size: 16vw; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .haze, .glint, .glow { animation: none; }
+      .glint { opacity: 0; }
+    }
+
+    /* Browsers without text clipping get plain silver text */
+    @supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+      .base { color: #d4d4d8; -webkit-text-fill-color: #d4d4d8; }
+      .glint, .glow { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="haze" aria-hidden="true"></div>
+  <div class="mark">
+    <h1>
+      <span class="base">atodua.ru</span>
+      <span class="glow" aria-hidden="true">atodua.ru</span>
+      <span class="glint" aria-hidden="true">atodua.ru</span>
+    </h1>
+    <span class="line" aria-hidden="true"></span>
+  </div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+</body>
+</html>
